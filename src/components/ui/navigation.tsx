@@ -1,12 +1,14 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { Menu, X } from 'lucide-react';
+// removed icon imports in favor of custom animated hamburger
 import { Button } from './button';
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeId, setActiveId] = useState<string>('');
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
+  const lastYRef = useRef<number>(0);
 
   const navItems = [
     { href: '#about', label: 'About Us' },
@@ -59,12 +61,31 @@ export const Navigation = () => {
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY || window.pageYOffset;
+      const lastY = lastYRef.current;
+      const delta = y - lastY;
+
+      // Scrolled state threshold
       setIsScrolled(y > 8);
+
+      // Auto-hide/show logic (ignore when mobile menu open)
+      if (!isOpen) {
+        if (delta > 6 && y > 64) {
+          setIsHidden(true);
+        } else if (delta < -6) {
+          setIsHidden(false);
+        }
+      } else {
+        setIsHidden(false);
+      }
+
+      lastYRef.current = y;
     };
+    // Initialize
+    lastYRef.current = window.scrollY || window.pageYOffset;
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [isOpen]);
 
   // Scroll spy for active link
   useEffect(() => {
@@ -95,10 +116,17 @@ export const Navigation = () => {
 
   return (
     <nav className={cn(
-      "fixed top-0 left-0 right-0 z-50 transition-all",
+      "fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out will-change-transform",
+      isHidden ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100",
       isScrolled
-        ? "bg-background/90 backdrop-blur supports-[backdrop-filter]:backdrop-blur border-b border-border/60 shadow-sm"
-        : "bg-transparent"
+        ? cn(
+            // Simple brand gradient when scrolled (no glitter)
+            "bg-hero-gradient border-b border-border/40 shadow-sm backdrop-blur supports-[backdrop-filter]:backdrop-blur"
+          )
+        : cn(
+            // Mobile gets a subtle brand gradient, desktop remains transparent
+            "md:bg-transparent bg-hero-gradient"
+          )
     )}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -106,9 +134,12 @@ export const Navigation = () => {
           <div className="flex-shrink-0">
             <a href="#" className="flex items-center gap-2">
               <img src="/favicon.ico" alt="King Street Boxing" className="h-6 w-6" />
+              {/* Shorter brand on mobile, full on desktop */}
               <span className={cn(
-                "text-2xl font-bold transition-colors",
-                isScrolled ? "text-primary" : "text-primary-foreground"
+                "text-2xl font-bold md:hidden text-primary-foreground"
+              )}>King Street</span>
+              <span className={cn(
+                "hidden md:inline text-2xl font-bold text-primary-foreground"
               )}>King Street Boxing</span>
             </a>
           </div>
@@ -137,9 +168,9 @@ export const Navigation = () => {
           {/* CTA Button */}
           <div className="hidden md:block">
             <a href="https://www.zeffy.com/en-US/donation-form/585fa366-e850-45a4-9902-052e1013cbd2?fbclid=PAZXh0bgNhZW0CMTEAAafJ_et_9jjijIw1Gy3VrNTgkSMlPCT35qb10a4vCjsFUkBUIBbKQTGLEw5vYg_aem__j6JDK_hy89tysLC5ioF1w" target="_blank" rel="noreferrer">
-              <Button variant="champion" size="sm">
-                Donate Now
-              </Button>
+            <Button variant="champion" size="sm">
+              Donate Now
+            </Button>
             </a>
           </div>
 
@@ -147,9 +178,30 @@ export const Navigation = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-foreground hover:text-primary p-2 rounded-md border border-transparent hover:border-border"
+              aria-label="Toggle navigation menu"
+              className={cn(
+                "relative h-10 w-10 text-foreground hover:text-primary p-2 rounded-md border border-transparent hover:border-border transition-colors"
+              )}
             >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
+              {/* Hamburger bars */}
+              <span
+                className={cn(
+                  "absolute left-2 right-2 top-3 h-0.5 bg-current transition-transform duration-300",
+                  isOpen ? "translate-y-2 rotate-45" : ""
+                )}
+              />
+              <span
+                className={cn(
+                  "absolute left-2 right-2 top-1/2 -translate-y-1/2 h-0.5 bg-current transition-opacity duration-300",
+                  isOpen ? "opacity-0" : "opacity-100"
+                )}
+              />
+              <span
+                className={cn(
+                  "absolute left-2 right-2 bottom-3 h-0.5 bg-current transition-transform duration-300",
+                  isOpen ? "-translate-y-2 -rotate-45" : ""
+                )}
+              />
             </button>
           </div>
         </div>
@@ -158,12 +210,21 @@ export const Navigation = () => {
       {/* Mobile Navigation */}
       {isOpen && (
         <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 bg-background/95 backdrop-blur border-b border-border">
+          <div className={cn(
+            "px-2 pt-2 pb-3 space-y-1 border-b border-border rounded-b-2xl shadow-lg overflow-hidden animate-accordion-down",
+            // Mobile dropdown keeps simple brand gradient
+            "bg-hero-gradient text-primary-foreground"
+          )}>
             {navItems.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${activeId === item.href ? 'bg-primary text-primary-foreground' : 'text-foreground hover:text-primary'}`}
+                className={cn(
+                  "block px-3 py-2 rounded-md text-base font-medium transition-all",
+                  activeId === item.href
+                    ? "bg-primary text-primary-foreground shadow-boxing"
+                    : "hover:bg-primary/10"
+                )}
                 onClick={(e) => handleNavClick(e, item.href)}
               >
                 {item.label}
@@ -171,9 +232,9 @@ export const Navigation = () => {
             ))}
             <div className="pt-4 pb-2">
               <a href="https://www.zeffy.com/en-US/donation-form/585fa366-e850-45a4-9902-052e1013cbd2?fbclid=PAZXh0bgNhZW0CMTEAAafJ_et_9jjijIw1Gy3VrNTgkSMlPCT35qb10a4vCjsFUkBUIBbKQTGLEw5vYg_aem__j6JDK_hy89tysLC5ioF1w" target="_blank" rel="noreferrer">
-                <Button variant="champion" size="sm" className="w-full">
-                  Donate Now
-                </Button>
+              <Button variant="champion" size="sm" className="w-full">
+                Donate Now
+              </Button>
               </a>
             </div>
           </div>

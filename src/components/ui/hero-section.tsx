@@ -4,7 +4,7 @@ import heroImage from '@/assets/hero-bg.jpg';
 
 export const HeroSection = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-8 sm:pt-12 md:pt-16">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 sm:pt-24 md:pt-28">
       {/* Background Image */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -43,7 +43,7 @@ export const HeroSection = () => {
           </div>
           
           {/* Stats */}
-          <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center animate-slide-in">
+          <div className="mt-16 mb-12 sm:mb-16 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 text-center animate-slide-in px-4 sm:px-0">
             <div className="bg-background/10 backdrop-blur-sm rounded-lg p-6 border border-primary-foreground/20">
               <div className="text-3xl sm:text-4xl font-bold text-accent mb-2">500+</div>
               <div className="text-primary-foreground/90">Youth Trained</div>
