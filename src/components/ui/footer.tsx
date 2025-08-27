@@ -36,7 +36,7 @@ export const Footer = () => {
                 <a href="#contact">
                   <Button variant="hero" size="sm">Contact Us</Button>
                 </a>
-              </div>
+            </div>
           </div>
 
           {/* Contact Info */}
@@ -69,7 +69,7 @@ export const Footer = () => {
                     <li>Friday – 06:00PM – 09:00PM</li>
                     <li>Saturday – Closed</li>
                   </ul>
-                </div>
+              </div>
             </div>
           </div>
 

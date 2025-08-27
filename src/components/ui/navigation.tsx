@@ -136,10 +136,7 @@ export const Navigation = () => {
               <img src="/favicon.ico" alt="King Street Boxing" className="h-6 w-6" />
               {/* Shorter brand on mobile, full on desktop */}
               <span className={cn(
-                "text-2xl font-bold md:hidden text-primary-foreground"
-              )}>King Street</span>
-              <span className={cn(
-                "hidden md:inline text-2xl font-bold text-primary-foreground"
+                "font-bold text-primary-foreground text-xl md:text-2xl"
               )}>King Street Boxing</span>
             </a>
           </div>
@@ -180,25 +177,25 @@ export const Navigation = () => {
               onClick={() => setIsOpen(!isOpen)}
               aria-label="Toggle navigation menu"
               className={cn(
-                "relative h-10 w-10 text-foreground hover:text-primary p-2 rounded-md border border-transparent hover:border-border transition-colors"
+                "relative h-10 w-10 text-primary-foreground p-2 rounded-md border border-transparent transition-colors"
               )}
             >
               {/* Hamburger bars */}
               <span
                 className={cn(
-                  "absolute left-2 right-2 top-3 h-0.5 bg-current transition-transform duration-300",
+                  "absolute left-2 right-2 top-3 h-0.5 bg-white transition-transform duration-300",
                   isOpen ? "translate-y-2 rotate-45" : ""
                 )}
               />
               <span
                 className={cn(
-                  "absolute left-2 right-2 top-1/2 -translate-y-1/2 h-0.5 bg-current transition-opacity duration-300",
+                  "absolute left-2 right-2 top-1/2 -translate-y-1/2 h-0.5 bg-white transition-opacity duration-300",
                   isOpen ? "opacity-0" : "opacity-100"
                 )}
               />
               <span
                 className={cn(
-                  "absolute left-2 right-2 bottom-3 h-0.5 bg-current transition-transform duration-300",
+                  "absolute left-2 right-2 bottom-3 h-0.5 bg-white transition-transform duration-300",
                   isOpen ? "-translate-y-2 -rotate-45" : ""
                 )}
               />
